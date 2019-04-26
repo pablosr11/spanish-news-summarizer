@@ -4,15 +4,19 @@ Copyright 2019, Pablo Sanderson Ramos
 
 news_scraper holds the two main functions to gather links and data from news articles URL
 """
+"""
+todo:   persist data (database, files?)
+        fail-checks on .finds
+        skip sentences < 5 words
+"""
 
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urlparse
+from urllib.parse import urlparse #parse the url
+import helpers #get all the helper functions
 
 def get_links(url,n_links=5):
 
     parsed_url = urlparse(url)
-    html = get_html(url) #get bs4 object
+    html = helpers.get_html(url) #get bs4 object
 
     # give parameters to scrape website depending on link
     if parsed_url.netloc == 'www.canarias7.es':
@@ -27,10 +31,12 @@ def extract_data(url):
     """Given news article URL, return a dict with its data organised"""
 
     parsed_url = urlparse(url)
-    html = get_html(url)
+    html = helpers.get_html(url)
 
     if parsed_url.netloc == 'www.canarias7.es':
-        text = html.find(attrs={'itemprop':'articleBody'})
+        text = html.find(attrs={'itemprop':'articleBody'}).get_text().strip()
+        if len(text.split()) < 150: #skip docs with less than 150 words
+            return None
         headline = html.find(attrs={'itemprop':'headline'})#.get_text().strip() if html.find(attrs={'itemprop':'headline'}) is not None else ""
         subheadline = html.find(attrs={'class':'subheadline'})
         date = html.find(attrs={'class':'datefrom'})
@@ -40,8 +46,8 @@ def extract_data(url):
         labels = [topic.find('a').get_text() for topic in html.find_all(attrs={'class':'topic'})]
 
     #get_text and strip() all elements of list that require it
-    to_text = [headline,subheadline,date,author,text,n_comments] 
-    [headline,subheadline,date,author,text,n_comments] =\
+    to_text = [headline,subheadline,date,author,n_comments] 
+    [headline,subheadline,date,author,n_comments] =\
         [x.get_text().strip() if x else "" for x in to_text]
    
    # extracted data in dict form
@@ -60,13 +66,7 @@ def extract_data(url):
     
     return data_dict
 
-def get_html(url):
-    """Given URL, output BeautifulSoup object of html content"""
 
-    raw_data = requests.get(url)
-    html = BeautifulSoup(raw_data.content, 'lxml')
-
-    return html
 
 if __name__ == "__main__":
     pass
