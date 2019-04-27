@@ -5,10 +5,11 @@ Copyright 2019, Pablo Sanderson Ramos
 nlp_scorer contains the main functions to calculate articles tf, 
 """
 """
-todo:   correct summary function
+todo:   summary sometimes return empty string
         create doc_repo structure {'headline':1,'link':1, 'cat':['1','2']}
         create word_repo structure{'word':{'doc_freq':0,'idf':0}}
         persist data (database,file?)
+        ngrams (2-size,3-size)
 """
 import helpers #get all the helper functions
 import collections #for fast frequency counters
@@ -78,7 +79,6 @@ def rank_sentences(doc,tfidf_dict,include_words=False):
     
     for sentence in sentences(doc):
         
-        print(sentence)
         word_list = helpers.clean(sentence)
         if len(word_list) < 5:
             continue #if less than 5 words in sentence, skip  
@@ -99,25 +99,25 @@ def top_words(word_list,tfidf_dict,n_words=5):
 
     return top_words
 
-def summarizer(doc,tfidf_dict,reduce_by=0.5,include_top_words=False):
+def summarizer(doc,tfidf_dict,reduce_by=0.5):
     """given document and its tfidf_dictionary, give summary of top X sentences"""
     
     ranked_sentences  = rank_sentences(doc,tfidf_dict)
     
     n_of_sentences = round(len(ranked_sentences)*(1-reduce_by))
-    summary = ""
+    summary_list = []
     
     top = sorted(ranked_sentences,key=lambda kv: kv[1],reverse=True)[:n_of_sentences]
         
     for sentence in ranked_sentences:
         if sentence in top:
-            summary += (sentence[0]+'. ')
+            summary_list.append(sentence[0])
  
-    
+    summary = ". ".join(x for x in summary_list)
     return summary 
 
 
 
 if __name__ == "__main__":
     print('hola')
-    print(top_words(['hol','gust','verd','gust'],{'hol':0.1,'gust':0.3,'verd':0.8},3))
+    print(summarizer('Hola hola hoy hace frio. Frio mesa frio que hola hoy. Hoy hace Hola frio hoy hoy',{'hol':0.1,'hoy':0.2,'ho':0.2,'hace':0.3,'hac':0.3,'frio':0.4,'fri':0.4,'mesa':0.5,'mes':0.5},0.9))
