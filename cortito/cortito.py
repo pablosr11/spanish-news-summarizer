@@ -3,7 +3,6 @@
 """
 
 """
-
 prepare NLP and WORD table (and connect it to article)
 
 

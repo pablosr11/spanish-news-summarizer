@@ -107,3 +107,4 @@ venv.bak/
 #pablo's
 .db
 /cortito/cortito.db
+.DS_Store
