@@ -19,11 +19,11 @@ lib64/
 parts/
 sdist/
 var/
-.vscode/
 wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.vscode/
 MANIFEST
 
 # PyInstaller
@@ -103,3 +103,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+#pablo's
+.db
