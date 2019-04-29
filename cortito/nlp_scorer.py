@@ -17,16 +17,17 @@ import math #calculate tfidf-log
 
 
 def calculate_tf(doc):
-    """Given text document, return dict of {stemmed_word:term_freq}. 
+    """Given text document, return dict of {stemmed_word:term_freq} and list of tuples
+    containing (stem_word, raw_word) for later use (CHANGE THIS)
     word_frequency_in_doc/total#ofwords
     """
     
-    #before using, check if tf is not already calculated for text
+    #separate stemming from cleaning to make it easier to control raw and stem words
     
     word_list = helpers.clean(doc) # retrieves list of processed(clean) words of doc
     doc_len = len(word_list) # how many words in doc
    
-    freq_dict = collections.Counter(word_list) # dict of word:frequency
+    freq_dict = collections.Counter([word[0] for word in word_list]) # dict of word:frequency
     
     # normalise tf by diving its frequency/doc_len
     tf_dict = { key:val/doc_len for key,val in freq_dict.items()}
@@ -34,7 +35,7 @@ def calculate_tf(doc):
     #update word_repo word frequency to calculate IDF log(totaldocuments/documentsWithWord)
     #[update_word_repo(word,WORD_REPO) for word in set(word_list)] #set so we dont count wordsx2 in a doc
    
-    return tf_dict
+    return tf_dict, word_list
 
 def calculate_word_idf(word, docs_repo,words_repo):
     """Given a word and the repo of documents and words
@@ -119,5 +120,6 @@ def summarizer(doc,tfidf_dict,reduce_by=0.5):
 
 
 if __name__ == "__main__":
-    print('hola')
-    print(summarizer('Hola hola hoy hace frio. Frio mesa frio que hola hoy. Hoy hace Hola frio hoy hoy',{'hol':0.1,'hoy':0.2,'ho':0.2,'hace':0.3,'hac':0.3,'frio':0.4,'fri':0.4,'mesa':0.5,'mes':0.5},0.9))
+
+    print(calculate_tf('Hola me llamo Fernando. Me gusta cocina almejas en V!inagre y cocerlas en la sarten. Hola de nuevo desde la cocina'))
+    print('-----nlp_scorer.py')

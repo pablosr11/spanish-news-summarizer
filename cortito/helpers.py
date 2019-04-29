@@ -23,7 +23,10 @@ def get_html(url):
     return html
 
 def clean(doc):
-    """Given string of text, return a list of its words clean of punctuation, stopwords etc"""
+    """Given string of text, return a list of tuples with
+    (raw_word,stem_word) of its words clean of punctuation, stopwords etc"""
+
+    #separate stemming from clean func to make it easier to handle raw/Stem versions
 
     doc = doc.lower()
     
@@ -34,10 +37,10 @@ def clean(doc):
 
     # if single word, stemm it and return it
     if len(doc.split()) == 1:
-        return stemmer.stem(doc) if doc not in stopwords.words('spanish') else ""
+        return stemmer.stem(doc),doc if doc not in stopwords.words('spanish') else ""
 
     #stemm and remove stopwords
-    cleaned = [stemmer.stem(word) for word in doc.split()\
+    cleaned = [(stemmer.stem(word),word) for word in doc.split()\
                if word not in stopwords.words('spanish')\
                if len(word)<25] #skip words longer than 25 to avoid html
     
