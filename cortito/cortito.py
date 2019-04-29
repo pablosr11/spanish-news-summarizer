@@ -6,7 +6,7 @@
 prepare NLP and WORD table (and connect it to article)
 multithread to make it faster
 dont keep articles with less than X words
-test it, is build word working as expect it=
+test it, is build word working as expected? no duplication, good aditions etc?
 
 
 """
@@ -69,7 +69,7 @@ def data_scraper(how_many=500):
 
 def build_word_repo():
     """
-    Given a text document, calculate its tf, tfidf, rank its sentences, score each
+    Goes through every article, calculate its tf, scores each
     word and store all data in database.
     """
 
@@ -134,12 +134,37 @@ def build_word_repo():
         art.nlp_analysed = True
         session.commit()
         
-        #print([x for x in words])
-        
     pass 
+
+def idf_updater():
+    """
+    Update each word IDF. Goes through word_repo updating it and commiting to db
+    """
+
+    total_docs = session.query(Article).count()
+    words_repo = session.query(Word_Repo).filter(Word_Repo.id<5)
+
+    for word in words_repo:
+
+        word_id = word.idf
+        word_occurrence = word.articles_with_word
+
+        word.idf = nlp.calculate_word_idf(total_docs,word_occurrence)
+        session.commit()
+
+    pass
+
+def nlp_magic():
+    """
+    for every article, calculate tfidf, rank its sentences, get top words and store a small summary
+    """
+
+    pass
+
 
 
 if __name__ == "__main__":
     #data_scraper()
-    build_word_repo()
+    #build_word_repo()
+    idf_updater()
     print('-----Cortito.py')

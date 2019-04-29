@@ -46,6 +46,10 @@ def clean(doc):
     
     return cleaned
 
+def sentences(doc):
+    """ given a doc, return a list of its sentences"""
+    return [s.strip() for s in doc.split('. ')]
+
 
 if __name__ == "__main__":
     print(clean('HOla'))

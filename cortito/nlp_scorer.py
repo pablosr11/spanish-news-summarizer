@@ -37,16 +37,13 @@ def calculate_tf(doc):
    
     return tf_dict, word_list
 
-def calculate_word_idf(word, docs_repo,words_repo):
+def calculate_word_idf(total_n_documents, articles_with_word):
     """Given a word and the repo of documents and words
     calculate the word's IDF - log(total#ofdocs/#ofdocswithWord) """ 
   
-    docs_len = len(docs_repo)
-    word = helpers.clean(word)
-    
     #dict comprenhension to calculate each word idf {word['idf']:inverse_doc_freq}
     try:
-        return math.log(docs_len/words_repo[word]['freq'])
+        return math.log(total_n_documents/articles_with_word)
     except Exception as e:
         print(e)
     #save data in word repo
@@ -68,17 +65,13 @@ def calculate_tfidf(word_tf, word_idf):
     
     return word_tf*word_idf
 
-def sentences(doc):
-    """ given a doc, return a list of its sentences"""
-    return [s.strip() for s in doc.split('. ')]
-
 def rank_sentences(doc,tfidf_dict,include_words=False):
     """given document and the document tfidf_dict {word:word_tfidfscore}, return list of
     ranked senteces and its score [(sent,score),(sen2,score2)]"""
     
     ranked_sentences = []
     
-    for sentence in sentences(doc):
+    for sentence in helpers.sentences(doc):
         
         word_list = helpers.clean(sentence)
         if len(word_list) < 5:
@@ -121,5 +114,5 @@ def summarizer(doc,tfidf_dict,reduce_by=0.5):
 
 if __name__ == "__main__":
 
-    print(calculate_tf('Hola me llamo Fernando. Me gusta cocina almejas en V!inagre y cocerlas en la sarten. Hola de nuevo desde la cocina'))
+    print(calculate_word_idf(52,6))
     print('-----nlp_scorer.py')
