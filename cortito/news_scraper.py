@@ -42,9 +42,6 @@ def extract_data(url):
         try:
             text = html.find(attrs={'itemprop':'articleBody'}).get_text().strip()\
                 if html.find(attrs={'itemprop':'articleBody'}) else ""
-            if len(text.split()) < 100: #skip docs with less than 150 words
-                print('less than 100 ',parsed_url.path[1:] )
-                #return 'Article has less than 100 words',parsed_url.path[1:]
             headline = html.find(attrs={'itemprop':'headline'})#.get_text().strip() if html.find(attrs={'itemprop':'headline'}) is not None else ""
             subheadline = html.find(attrs={'class':'subheadline'})
             date = html.find(attrs={'class':'datefrom'})

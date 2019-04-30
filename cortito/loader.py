@@ -2,8 +2,6 @@
 
     Copyright 2019 Pablo Sanderson Ramos
 
-todo:   change all repo to pickle dict,list data
-        include latest scraped time in article (datetime sqlalchemy)
     
 """
 

@@ -7,7 +7,6 @@ nlp_scorer contains the main functions to calculate articles tf,
 """
 todo:   summary sometimes return empty string
         ngrams (2-size,3-size)
-        skip sentences < 5 words
         calculate tf does multiple things, simplify and separate
 """
 import helpers #get all the helper functions
@@ -75,19 +74,18 @@ def rank_sentences(doc,tfidf_dict,include_words=False):
         word_list = helpers.clean(sentence)
         if len(word_list) < 5:
             continue #if less than 5 words in sentence, skip  
-        score = sum([tfidf_dict[word] for word in word_list])
+        score = sum([tfidf_dict[word[0]] for word in word_list])
     
         ranked_sentences.append((sentence,score))
     
-    if include_words:
-        pass #include calculate top words (of doc, of included sentences?)
     
     return ranked_sentences
 
-def top_words(word_list,tfidf_dict,n_words=5):
+def top_words(doc,tfidf_dict,n_words=5):
     """Given list of words, and its tfidf dict {word:tfidf_score} return list of top X words"""
 
-    words_score = [(word,tfidf_dict[word]) for word in set(word_list)] #set to avoid including same words twice
+    word_list = helpers.clean(doc)
+    words_score = [(x,tfidf_dict[x]) for x in set([word[0] for word in word_list])] #set to avoid including same words twice
     top_words = sorted(words_score,key=lambda kv: kv[1],reverse=True)[0:n_words]
 
     return top_words
@@ -113,5 +111,5 @@ def summarizer(doc,tfidf_dict,reduce_by=0.5):
 
 if __name__ == "__main__":
 
-    print(calculate_word_idf(52,6))
+    print(rank_sentences('hol est. est blu. hol ama',{'hol':0.3,'est':0.1,'blu':0.8, 'ama':0.4}))
     print('-----nlp_scorer.py')
