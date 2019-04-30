@@ -6,10 +6,9 @@ nlp_scorer contains the main functions to calculate articles tf,
 """
 """
 todo:   summary sometimes return empty string
-        create doc_repo structure {'headline':1,'link':1, 'cat':['1','2']}
-        create word_repo structure{'word':{'doc_freq':0,'idf':0}}
-        persist data (database,file?)
         ngrams (2-size,3-size)
+        skip sentences < 5 words
+        calculate tf does multiple things, simplify and separate
 """
 import helpers #get all the helper functions
 import collections #for fast frequency counters

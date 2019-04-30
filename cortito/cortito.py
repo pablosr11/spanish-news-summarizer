@@ -49,6 +49,10 @@ def data_scraper(how_many=500):
             full_link = outlet+link
             data = ns.extract_data(full_link)
 
+            #get term freq for document
+            # tf(stemword:term_freq) and words[(stem,raw)]
+            tf,_= nlp.calculate_tf(data['raw_text']) 
+
             article = Article(
                 newspaper=data['newspaper'],
                 link = data['news_link'],
@@ -60,6 +64,7 @@ def data_scraper(how_many=500):
                 main_cat = data['main_cat'],
                 sub_cat = data['sub_cat'],
                 raw_text = data['raw_text'],
+                term_freq = tf,
                 nlp_analysed = False,
                 last_scrape_date = datetime.datetime.now()
             )
@@ -73,7 +78,7 @@ def build_word_repo():
     word and store all data in database.
     """
 
-    docs_repo = session.query(Article).filter(Article.id<5)
+    docs_repo = session.query(Article)
 
     #right now iterates over everything, look for a way to filter it out (old files no need to redo?)
     for article in docs_repo:
@@ -90,20 +95,10 @@ def build_word_repo():
             continue
 
         # tf(stemword:term_freq) and words[(stem,raw)]
-        tf,word_list = nlp.calculate_tf(text) 
+        _,word_list = nlp.calculate_tf(text) 
 
         #store tf and words in respective repos
         #keep track of analysed links to dont store value twice
-
-        article_nlp = Article_NLP(
-            article_id = article.id,
-            term_freq = tf,
-            ranked_sentences = {},
-            top_words = {},
-            short_summary = ''
-        )
-        session.add(article_nlp)
-        session.commit()
 
         
         for word_tuple in word_list:
@@ -158,13 +153,14 @@ def nlp_magic():
     """
     for every article, calculate tfidf, rank its sentences, get top words and store a small summary
     """
+    print('NLP Magic')
 
     pass
 
 
 
 if __name__ == "__main__":
-    #data_scraper()
-    #build_word_repo()
+    data_scraper(10)
+    build_word_repo()
     idf_updater()
     print('-----Cortito.py')

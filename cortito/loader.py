@@ -32,6 +32,7 @@ class Article(Base):
     main_cat = Column(String)
     sub_cat = Column(String)
     raw_text = Column(String)
+    term_freq = Column(PickleType) #move to other table as they keep varying with new idfs
     nlp_analysed = Column(Boolean)
     last_scrape_date = Column(DateTime)
 
@@ -52,7 +53,6 @@ class Article_NLP(Base):
 
     id = Column(Integer, primary_key=True)
     article_id = Column(Integer, ForeignKey('article.id'), unique=True)
-    term_freq = Column(PickleType) #move to other table as they keep varying with new idfs
     ranked_sentences = Column(PickleType)
     top_words = Column(PickleType)
     short_summary = Column(String)

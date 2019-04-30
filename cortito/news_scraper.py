@@ -6,7 +6,7 @@ news_scraper holds the two main functions to gather links and data from news art
 """
 """
 todo:   fail-checks on .finds
-        skip sentences < 5 words
+        extremely slow
 """
 
 from urllib.parse import urlparse #parse the url
