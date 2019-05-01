@@ -24,7 +24,7 @@ def get_links(url,n_links=5):
     if parsed_url.netloc == 'www.canarias7.es':
         for link in html.find_all(['h2','h3'], attrs={'class':'headline'}, limit=n_links): #include div (more news but more noise)
             if not link.parent.has_attr('href'):
-                print('NO LINK, ',link.get_text().strip())
+                #print('NO LINK, ',link.get_text().strip())
                 continue    # skip None links - without the structure (normally voting polls etc)
             links.append(link.parent['href'])
 
