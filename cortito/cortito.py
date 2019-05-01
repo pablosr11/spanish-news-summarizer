@@ -3,7 +3,14 @@
 """
 
 """
+cut idf updater to not run whole thing every time if no new data
+#add printing statements at the end of each step and delete intermediary. (total docs 800, new 235, skip 53) etc
 streamline whole process every X hours (2,6?) and refactor/correct mistakes
+idf extremely slow, dont update if no new words?
+
+deploy to server
+quick website with flask
+update idf takes a loooot of time even when not new news
 multithread to make it faster (web scraping)
 separate calculatetf in two functions
 dont keep articles with less than X words
@@ -11,8 +18,8 @@ TESTING build word working as expected? no duplication, good aditions etc?
 TESTING idf working?
 #still need to clean » symbols and HTML from text
 
-
 """
+
 import sys#look for files outsite directory as well
 sys.path.append('../')
 
@@ -21,6 +28,8 @@ import news_scraper as ns #import scraping functionality
 import nlp_scorer as nlp #nlp functionality
 import datetime #get scraping time
 import pickle
+import time
+import traceback
 from sqlalchemy import between
 import settings #import list of newspapers
 from loader import Article, Word_Repo, Article_NLP, db_engine
@@ -38,7 +47,11 @@ def data_scraper(how_many=500):
     optional parameter for how many links to scrape
     """
 
-    print('Starting Data Scraper--')
+    print('-- Starting Data Scraper')
+
+    #trackers of before/after numbers of docs and link activity
+    before_docs = session.query(Article).count()
+    links_scraped, links_skipped = 0, 0
 
     for outlet in settings.OUTLETS:
  
@@ -51,7 +64,7 @@ def data_scraper(how_many=500):
             if session.query(Article).filter(Article.link == link).first():
                 continue
 
-            print(link)
+            links_scraped+=1
 
             # get all text, headlines etc from each article and store it in DB
             full_link = outlet+link
@@ -59,7 +72,7 @@ def data_scraper(how_many=500):
 
             #skip articles with less than 100 words
             if len(data['raw_text'].split()) < 100:
-                print('\tLess than 100 words')
+                links_skipped += 1
                 continue
 
             #get term freq for document
@@ -85,13 +98,22 @@ def data_scraper(how_many=500):
             session.add(article)
             session.commit()
 
+    after_docs = session.query(Article).count()
+
+    print(f'[Articles] Before: {before_docs} - After: {after_docs} - New ones: {after_docs-before_docs}\
+        \n[Articles] Links Scrapped: {links_scraped} - Skipped: {links_skipped}')
+
+
 def build_word_repo():
     """
     Goes through every article, calculate its tf, scores each
     word and store all data in database.
     """
 
-    print('Building Word Repo---')
+    print('-- Building Word Repo')
+    before_words = session.query(Word_Repo).count()
+    articles_analysed = 0
+    total_word_occurrences = 0
 
     docs_repo = session.query(Article)
 
@@ -141,6 +163,7 @@ def build_word_repo():
                     raw.articles_with_word += 1
                     words_included.add(w_stemm)
 
+                total_word_occurrences += 1
                 raw.total_occurences += 1
                 session.commit()
                 continue
@@ -153,6 +176,7 @@ def build_word_repo():
                 total_occurences = 1,
                 idf = 1.0
             )
+            articles_analysed +=1
             session.add(word_repo)
             session.commit()
         
@@ -160,17 +184,21 @@ def build_word_repo():
         art.nlp_analysed = True
         session.commit()
         
-    pass 
+    after_words = session.query(Word_Repo).count()
+    print(f'[Words] Before: {before_words} - After: {after_words} - New ones: {after_words-before_words}\
+        \n[Words] Articles analysed : {articles_analysed}, Word Occurrences added: {total_word_occurrences}')
 
 def idf_updater():
     """
     Update each word IDF. Goes through word_repo updating it and commiting to db
     """
 
-    print('Updating IDFs---')
+    print('-- Updating IDFs')
+
+    # if no new data, stop it
 
     total_docs = session.query(Article).count()
-    words_repo = session.query(Word_Repo)#.filter(Word_Repo.id<5)
+    words_repo = session.query(Word_Repo)
 
     for word in words_repo:
 
@@ -217,6 +245,18 @@ def nlp_magic():
         #keep summary to the smallest
         summary = nlp.summarizer(article.raw_text,doc_tfidf,0.99)
 
+
+        art_nlp = session.query(Article_NLP).filter(Article_NLP.article_id == article.id).first()
+
+        #if item already in database, update numbers and continue, no need to create
+        if art_nlp:
+            art_nlp.ranked_sentences = ranked_sentences
+            art_nlp.top_words = top_words
+            art_nlp.short_summary = summary
+            session.commit()
+            continue
+
+
         #persist data in database
         article_nlp = Article_NLP(
             article_id = article.id,
@@ -228,10 +268,20 @@ def nlp_magic():
         session.add(article_nlp)
         session.commit()
 
-
 if __name__ == "__main__":
-    #data_scraper(10)
-    #build_word_repo()
-    #idf_updater()
-    nlp_magic()
-    print('-----Cortito.py')
+    while True:
+        print(f"{time.ctime()}: Starting cycle")
+        try:
+            data_scraper()
+            build_word_repo()
+            idf_updater()
+            nlp_magic()
+        except KeyboardInterrupt:
+            print("Exiting....")
+            sys.exit(1)
+        except Exception as exc:
+            print("Error with the scraping:", sys.exc_info()[0])
+            traceback.print_exc()
+        else:
+            print(f"{time.ctime()}: Successfully finished")
+        time.sleep(settings.WAITING_TIME)
