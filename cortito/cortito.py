@@ -3,18 +3,16 @@
 """
 
 """
-summaries not working (all "" )
-Refactor/correct mistakes
-
-deploy to server
-quick website with flask
-multithread to make it faster (web scraping)
-separate calculatetf in two functions
-dont keep articles with less than X words
-TESTING build word working as expected? no duplication, good aditions etc?
-TESTING idf working?
-testing sets
-#still need to clean » symbols and HTML from text
+summaries not working (empty strings)
+General refactor
+    improve cleaning func (» symbols and HTML from text)
+    multithread on web scraping
+    separate calculate tf in two functs
+    reduce complexity   
+Build test cases for main func.
+    check updates are implemented
+Deploy to server
+Flask basic website to show headlines (w/o summaries)
 
 """
 

@@ -42,7 +42,7 @@ def clean(doc):
     #stemm and remove stopwords
     cleaned = [(stemmer.stem(word),word) for word in doc.split()\
                if word not in stopwords.words('spanish')\
-               if 2<len(word)<25] #skip words longer than 25 to avoid html
+               if len(word)<25] #skip words longer than 25 to avoid html
     
     return cleaned
 
