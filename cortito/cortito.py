@@ -3,16 +3,19 @@
 """
 
 """
-summaries not working (empty strings)
+Flask basic website to show headlines (w/o summaries)
+Build test cases for main func.
+    check updates are implemented
+Other func
+    How to choose best news to show? cosine similarity? + others?
 General refactor
+    add provincia/noticanarias/https://www.todalaprensa.com/Espana/canarias.htm
     improve cleaning func (» symbols and HTML from text)
     multithread on web scraping
     separate calculate tf in two functs
-    reduce complexity   
-Build test cases for main func.
-    check updates are implemented
-Deploy to server
-Flask basic website to show headlines (w/o summaries)
+    reduce complexity
+
+
 
 """
 
@@ -37,7 +40,7 @@ Session = sessionmaker(bind=db_engine)
 session = Session()
 
 # set of updated words (included in new articles). dont delete
-ww = set()
+word_update_idf = set()
 
 def data_scraper(how_many=500):
     """
@@ -144,7 +147,7 @@ def build_word_repo():
             w_raw = word_tuple[1]
 
             #add words to tracker to update idfs only of these words (Avoid long loops)
-            ww.add(w_stemm)
+            word_update_idf.add(w_stemm)
 
             #check if word already stored
             raw = session.query(Word_Repo).filter(Word_Repo.word_stemm == w_stemm).first()
@@ -155,10 +158,14 @@ def build_word_repo():
 
                 #fail check
                 if raw.articles_with_word > docs_repo.count():
+                    print(f'{raw.word_raw} appears in more docs than total docs')
+                    continue
+                    """
                     sys.exit(f'TFIDF Error - More articles with word than articles.\
-                     \nWord: {raw.word_stemm}\
+                     \nWord: {raw.word_stemm}, {raw.word_raw}\
                      \nTotal docs:  {docs_repo.count()}\
                      \nDocs with Word: {raw.articles_with_word}')
+                     """
 
 
                 #if we haven't store this document word, update counter and add it to tracker
@@ -182,10 +189,6 @@ def build_word_repo():
             session.add(word_repo)
             session.commit()
         
-        #change flag after analysing and commit
-        art.nlp_analysed = True
-        session.commit()
-        
     after_words = session.query(Word_Repo).count()
     print(f'[Words] Before: {before_words} - After: {after_words} - New ones: {after_words-before_words}\
         \n[Words] Articles analysed : {articles_analysed}, Word Occurrences added: {total_word_occurrences}')
@@ -199,7 +202,7 @@ def idf_updater():
     idf_counter = 0
 
     # only update idfs of new added words
-    words_repo = session.query(Article).filter(Article.id.in_(ww))
+    words_repo = session.query(Word_Repo).filter(Word_Repo.word_stemm.in_(word_update_idf))
     total_docs = session.query(Article).count()
 
     for word in words_repo:
@@ -231,7 +234,7 @@ def nlp_magic():
     for article in articles:
 
         # check if words updated are included in the articles, if not, skip the article
-        if len(ww & set(article.term_freq)) < 1:
+        if len(word_update_idf & set(article.term_freq)) < 1:
             continue
         
         #article's words tf-idf scores.
@@ -252,23 +255,28 @@ def nlp_magic():
             #store new tfidf score in local dict
             doc_tfidf[word] = nlp.calculate_tfidf(term_freq,w_idf)
 
+       
         #rank sentences
         ranked_sentences = nlp.rank_sentences(article.raw_text,doc_tfidf)
 
         #top 5 words
         top_words = nlp.top_words(article.raw_text,doc_tfidf)
 
-        #keep summary to the smallest
-        summary = nlp.summarizer(article.raw_text,doc_tfidf,0.99)
+        #keep summary to the smallest (function will round up to avoid empty strings)
+        summary = nlp.summarizer(article.raw_text,doc_tfidf,0.90)
 
-
+        #get the article from database
         art_nlp = session.query(Article_NLP).filter(Article_NLP.article_id == article.id).first()
+
+        #sum the score out of its sentences
+        art_score = sum([x[1] for x in ranked_sentences])
 
         #if item already in database, update numbers and continue, no need to create
         if art_nlp:
             art_nlp.ranked_sentences = ranked_sentences
             art_nlp.top_words = top_words
             art_nlp.short_summary = summary
+            art_nlp.score = art_score
             session.commit()
             continue
 
@@ -278,14 +286,17 @@ def nlp_magic():
             article_id = article.id,
             ranked_sentences = ranked_sentences,
             top_words = top_words,
-            short_summary = summary
+            short_summary = summary,
+            score = art_score
         )
 
+        #change flag and add to database
+        article.nlp_analysed = True
         session.add(article_nlp)
         session.commit()
     
-    #clear set with words updated
-    ww.clear()
+
+    word_update_idf.clear()
 
     print(f'[NLP] Articles updated: {articles_updated}')
 

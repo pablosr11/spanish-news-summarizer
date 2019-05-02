@@ -54,6 +54,8 @@ class Article_NLP(Base):
     ranked_sentences = Column(PickleType)
     top_words = Column(PickleType)
     short_summary = Column(String)
+    score = Column(Float)
+
 
     article = relationship('Article', back_populates='article_nlp')
 
