@@ -3,19 +3,17 @@
 """
 
 """
-cut idf updater to not run whole thing every time if no new data
-#add printing statements at the end of each step and delete intermediary. (total docs 800, new 235, skip 53) etc
-streamline whole process every X hours (2,6?) and refactor/correct mistakes
-idf extremely slow, dont update if no new words?
+summaries not working (all "" )
+Refactor/correct mistakes
 
 deploy to server
 quick website with flask
-update idf takes a loooot of time even when not new news
 multithread to make it faster (web scraping)
 separate calculatetf in two functions
 dont keep articles with less than X words
 TESTING build word working as expected? no duplication, good aditions etc?
 TESTING idf working?
+testing sets
 #still need to clean » symbols and HTML from text
 
 """
@@ -40,6 +38,8 @@ from sqlalchemy.orm import sessionmaker
 Session = sessionmaker(bind=db_engine)
 session = Session()
 
+# set of updated words (included in new articles). dont delete
+ww = set()
 
 def data_scraper(how_many=500):
     """
@@ -53,10 +53,10 @@ def data_scraper(how_many=500):
     before_docs = session.query(Article).count()
     links_scraped, links_skipped = 0, 0
 
-    for outlet in settings.OUTLETS:
+    for newspaper in settings.OUTLETS:
  
-        # get all news links for each outlet
-        news_link = ns.get_links(outlet.strip(),how_many)
+        # get all news links for each newspaper
+        news_link = ns.get_links(newspaper.strip(),how_many)
 
         for link in news_link:
 
@@ -67,7 +67,7 @@ def data_scraper(how_many=500):
             links_scraped+=1
 
             # get all text, headlines etc from each article and store it in DB
-            full_link = outlet+link
+            full_link = newspaper+link
             data = ns.extract_data(full_link)
 
             #skip articles with less than 100 words
@@ -120,6 +120,8 @@ def build_word_repo():
     #right now iterates over everything, look for a way to filter it out (old files no need to redo?)
     for article in docs_repo:
 
+        articles_analysed +=1
+
         text_id = article.id
         text = article.raw_text #text document
 
@@ -142,6 +144,9 @@ def build_word_repo():
 
             w_stemm = word_tuple[0]
             w_raw = word_tuple[1]
+
+            #add words to tracker to update idfs only of these words (Avoid long loops)
+            ww.add(w_stemm)
 
             #check if word already stored
             raw = session.query(Word_Repo).filter(Word_Repo.word_stemm == w_stemm).first()
@@ -176,7 +181,6 @@ def build_word_repo():
                 total_occurences = 1,
                 idf = 1.0
             )
-            articles_analysed +=1
             session.add(word_repo)
             session.commit()
         
@@ -194,42 +198,56 @@ def idf_updater():
     """
 
     print('-- Updating IDFs')
+    idf_counter = 0
 
-    # if no new data, stop it
-
+    # only update idfs of new added words
+    words_repo = session.query(Article).filter(Article.id.in_(ww))
     total_docs = session.query(Article).count()
-    words_repo = session.query(Word_Repo)
 
     for word in words_repo:
 
-        word_id = word.idf
         word_docs_with_word = word.articles_with_word
+        idf_counter += 1
 
         word.idf = nlp.calculate_word_idf(total_docs,word_docs_with_word)
         session.commit()
 
-    pass
+    print(f'[IDF] Word\'s updated: {idf_counter}')
+
+    #reset set of words updated
 
 def nlp_magic():
     """
     for every article, calculate tfidf, rank its sentences, get top words and store a small summary
     """
 
-    print('Ranking Sentences---')
+    print('-- Ranking Sentences')
 
-    articles = session.query(Article)#.filter(between(Article.id,2,3))
+    #tracker for final print statement
+    articles_updated = 0
+
+    articles = session.query(Article)
     words = session.query(Word_Repo)
 
+    
     for article in articles:
+
+        # check if words updated are included in the articles, if not, skip the article
+        if len(ww & set(article.term_freq)) < 1:
+            continue
         
         #article's words tf-idf scores.
         doc_tfidf = {}
+
+        #tracker
+        articles_updated += 1
 
         for word, term_freq in article.term_freq.items():
 
             #get idf of the current word we are iterating
             w_idf = words.filter(Word_Repo.word_stemm == word).first().idf
         
+            #fail check as both idf and tf have to be positive
             if w_idf < 0 or term_freq < 0:
                 print('(INVALID) Negative IDF or TF', article.link)
 
@@ -267,6 +285,11 @@ def nlp_magic():
 
         session.add(article_nlp)
         session.commit()
+    
+    #clear set with words updated
+    ww.clear()
+
+    print(f'[NLP] Articles updated: {articles_updated}')
 
 if __name__ == "__main__":
     while True:
@@ -280,7 +303,7 @@ if __name__ == "__main__":
             print("Exiting....")
             sys.exit(1)
         except Exception as exc:
-            print("Error with the scraping:", sys.exc_info()[0])
+            print("Error in:", sys.exc_info()[0])
             traceback.print_exc()
         else:
             print(f"{time.ctime()}: Successfully finished")
