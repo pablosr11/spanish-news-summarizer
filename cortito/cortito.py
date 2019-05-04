@@ -3,11 +3,14 @@
 """
 
 """
-Flask basic website to show headlines (w/o summaries)
+Flask basic website to show headlines (w/o summaries). Headline+source+score.
+
+Other
+    How to choose best news to show? cosine similarity? + others?
+    Access to summary / news source?
+    Comments etc etc etc
 Build test cases for main func.
     check updates are implemented
-Other func
-    How to choose best news to show? cosine similarity? + others?
 General refactor
     add provincia/noticanarias/https://www.todalaprensa.com/Espana/canarias.htm
     improve cleaning func (» symbols and HTML from text)
@@ -31,12 +34,12 @@ import time
 import traceback
 from sqlalchemy import between
 import settings #import list of newspapers
-from loader import Article, Word_Repo, Article_NLP, db_engine
+from database import Article, Article_NLP, Word_Repo
+from database import Session
 from sqlalchemy.orm import sessionmaker
 
 
 #initiate session to talk to the database
-Session = sessionmaker(bind=db_engine)
 session = Session()
 
 # set of updated words (included in new articles). dont delete
@@ -234,7 +237,7 @@ def nlp_magic():
     for article in articles:
 
         # check if words updated are included in the articles, if not, skip the article
-        if len(word_update_idf & set(article.term_freq)) < 1:
+        if len(word_update_idf & set(article.term_freq)) < 5:
             continue
         
         #article's words tf-idf scores.
@@ -295,10 +298,11 @@ def nlp_magic():
         session.add(article_nlp)
         session.commit()
     
-
+    #empty tracker of new words added
     word_update_idf.clear()
 
     print(f'[NLP] Articles updated: {articles_updated}')
+
 
 if __name__ == "__main__":
     while True:

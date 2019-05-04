@@ -9,4 +9,4 @@
 OUTLETS = ['https://www.canarias7.es/']
 
 #waiting time between processes
-WAITING_TIME = 60*5 #30min
+WAITING_TIME = 60*60 #60min
