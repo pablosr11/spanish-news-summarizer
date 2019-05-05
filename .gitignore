@@ -109,3 +109,4 @@ venv.bak/
 /cortito/cortito.db
 .DS_Store
 /cortito/main.db
+cortito/main.db

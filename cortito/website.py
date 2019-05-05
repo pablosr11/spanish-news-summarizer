@@ -1,14 +1,16 @@
 from flask import Flask
-from .database import Session, Article
+from flask import render_template
+from sqlalchemy import desc
+from .database import Session, Article, Article_NLP
 
 app = Flask(__name__)
 
 @app.route('/')
 def website():
-    a = [x.headline for x in Article.query.filter(Article.id>5, Article.id <15)]
-    for x in a:
-        return x
-    return f'hello darling, {a}'
+    articles = Article.query.order_by(desc(Article.last_scrape_date)).limit(35)
+    #points not corresponding to articles, join on article.id == article_nlp.article_id and order the same
+    nlps = Article_NLP.query.all()
+    return render_template('rss/index.html', articles=zip(articles,nlps))
 
 
 @app.teardown_appcontext

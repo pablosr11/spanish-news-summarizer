@@ -3,7 +3,10 @@
 """
 
 """
-Flask basic website to show headlines (w/o summaries). Headline+source+score.
+Flask basic website
+    - add provincia/noticanarias/https://www.todalaprensa.com/Espana/canarias.htm
+    - upvote + databse https://stackoverflow.com/questions/30473647/how-can-i-detect-if-a-user-tries-to-upvote-once-again 
+    - points not matching with article
 
 Other
     How to choose best news to show? cosine similarity? + others?
@@ -14,6 +17,7 @@ Build test cases for main func.
 General refactor
     add provincia/noticanarias/https://www.todalaprensa.com/Espana/canarias.htm
     improve cleaning func (» symbols and HTML from text)
+    if no author, anonimo
     multithread on web scraping
     separate calculate tf in two functs
     reduce complexity
