@@ -15,6 +15,9 @@ import helpers #get all the helper functions
 def get_links(url,n_links=5):
     """Given a news outlet main website, return its news links. Identifies where links are depending on outlet"""
 
+    # it doesnt get content that loads with JS - solution would query directly those urls
+    # https://gohighbrow.com/scraping-javascript-heavy-websites/ not implemented
+
     parsed_url = urlparse(url)
     html = helpers.get_html(url) #get bs4 object
 
@@ -27,9 +30,23 @@ def get_links(url,n_links=5):
             if not link.parent.has_attr('href'):# skip None links - without the structure (normally voting polls etc)
                 continue
             links.append(link.parent['href'])
+
     if parsed_url.netloc == 'www.laprovincia.es':
         for link in html.find_all('a', attrs={'data-tipo':'noticia'}):
             links.append(link['href'])
+
+    if parsed_url.netloc == 'www.eldia.es':
+        for link in html.find_all('a', attrs={'data-tipo':'noticia'}):
+            links.append(link['href'])
+    
+    if parsed_url.netloc == 'www.noticanarias.com':
+        for link in html.find_all('a', attrs={'itemprop':'url'}):
+            links.append(link['href'])
+
+    if parsed_url.netloc == 'www.canarias24horas.com':
+        for link in html.find_all('h4', attrs={'class':'nspHeader'}):
+            links.append(link.findChildren('a')[0]['href'])
+    
     
     return links
 
@@ -51,7 +68,7 @@ def extract_data(url):
                 if html.find(attrs={'class':'subheadline'}) else ""
             date = html.find(attrs={'class':'datefrom'}).get_text().strip()\
                 if html.find(attrs={'class':'datefrom'}) else ""
-            author = html.find(attrs={'itemprop':'author'}).get_text().strip()\
+            author = html.find(attrs={'itemprop':'author'}).get_text().strip().title()\
                 if html.find(attrs={'itemprop':'author'}) else 'Anónimo'
             n_comments = html.find(attrs={'class':'numComments'}).get_text().strip()\
                 if html.find(attrs={'class':'numComments'}) else 0
@@ -70,7 +87,7 @@ def extract_data(url):
                 if html.find(attrs={'itemprop':'description'}) else ""
             date = html.find(attrs={'itemprop':'dateCreated'}).get_text().split('|')[0].strip()\
                 if html.find(attrs={'itemprop':'dateCreated'}) else ""
-            author = html.find(attrs={'itemprop':'author'}).get_text().strip()\
+            author = html.find(attrs={'itemprop':'author'}).get_text().strip().title()\
                 if html.find(attrs={'itemprop':'author'}) else 'Anónimo'
             n_comments = html.find(attrs={'class':'textveces'}).get_text().strip()\
                 if html.find(attrs={'class':'textveces'}) else 0
@@ -78,6 +95,62 @@ def extract_data(url):
             labels = [] #[topic.get_text() for topic in html.find(attrs={'id':'listaTags'}).findChildren('a')]
         except Exception as e:
             print(e, parsed_url.path[1:])
+
+    if parsed_url.netloc == 'www.eldia.es':
+        try:
+            text = html.find(attrs={'itemprop':'articleBody'}).get_text().strip()\
+                if html.find(attrs={'itemprop':'articleBody'}) else ""
+            headline = html.find(attrs={'itemprop':'headline'}).get_text().strip()\
+                if html.find(attrs={'itemprop':'headline'}) else ""
+            subheadline = html.find(attrs={'itemprop':'description'}).get_text().strip()\
+                if html.find(attrs={'itemprop':'description'}) else ""
+            date = html.find(attrs={'itemprop':'dateCreated'}).get_text().split('|')[0].strip()\
+                if html.find(attrs={'itemprop':'dateCreated'}) else ""
+            author = html.find(attrs={'itemprop':'author'}).get_text().strip().title()\
+                if html.find(attrs={'itemprop':'author'}) else 'Anónimo'
+            n_comments = html.find(attrs={'class':'textveces'}).get_text().strip()\
+                if html.find(attrs={'class':'textveces'}) else 0
+            categories = parsed_url.path.split('/')[1:3]
+            labels = [] #[topic.get_text() for topic in html.find(attrs={'id':'listaTags'}).findChildren('a')]
+        except Exception as e:
+            print(e, parsed_url.path[1:])
+
+    if parsed_url.netloc == 'www.noticanarias.com':
+        try:
+            text = ' '.join([x.get_text().strip() for x in html.find(attrs={'itemprop':'articleBody'}).findChildren('p')])\
+                if html.find(attrs={'itemprop':'articleBody'}) else ""
+            headline = html.find(attrs={'itemprop':'headline'}).get_text().strip()\
+                if html.find(attrs={'itemprop':'headline'}) else ""
+            subheadline = ""
+            date = html.find(attrs={'class':'vw-post-date updated'}).findChildren('time')[0]['datetime'].split('T')[0].strip()\
+                if html.find(attrs={'class':'vw-post-date updated'}) else ""
+            author = html.find(attrs={'itemprop':'name'}).get_text().strip().title()\
+                if html.find(attrs={'itemprop':'name'}) else 'Anónimo'
+            n_comments = ""
+            categories = ['','']
+            labels = [] #[topic.get_text() for topic in html.find(attrs={'id':'listaTags'}).findChildren('a')]
+        except Exception as e:
+            print(e, parsed_url.path[1:])
+
+    if parsed_url.netloc == 'www.canarias24horas.com':
+        try:
+            text = html.find(attrs={'class':'itemFullText'}).get_text().strip()\
+                if html.find(attrs={'class':'itemFullText'}) else ""
+            headline = html.find(attrs={'class':'itemTitle'}).get_text().strip()\
+                if html.find(attrs={'class':'itemTitle'}) else ""
+            subheadline = html.find(attrs={'class':'itemIntroText'}).get_text().strip()\
+                if html.find(attrs={'class':'itemIntroText'}) else ""
+            date = html.find(attrs={'class':'gkDate'}).get_text().strip()\
+                if html.find(attrs={'class':'gkDate'}) else ""
+            author = html.find(attrs={'class':'itemAuthor'}).get_text().strip().title()\
+                if html.find(attrs={'class':'itemAuthor'}) else 'Anónimo'
+            n_comments = ""
+            categories = parsed_url.path.split('/')[1:3]
+            labels = [topic.get_text() for topic in html.find(attrs={'class':'itemTags'}).findChildren('a')]\
+                if html.find(attrs={'class':'itemTags'}) else []
+        except Exception as e:
+            print(e, parsed_url.path[1:])
+
     
     
    #save categories in one
@@ -101,6 +174,7 @@ def extract_data(url):
 
 
 if __name__ == "__main__":
-    a= extract_data('https://www.laprovincia.es/gran-canaria/2019/05/06/cabildo-esconde-juez-documentos-adquisicion/1172010.html')
-    print(a)
     pass
+    #print(get_links('http://www.eldigitaldecanarias.net/'))
+    #for x in get_links('http://www.eldigitaldecanarias.net'):
+    #    print(extract_data(x))

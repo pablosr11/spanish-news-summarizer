@@ -4,13 +4,11 @@
 
 """
 Flask basic website
-    - noticanarias/https://www.todalaprensa.com/Espana/canarias.htm
-    - points not matching with article
-    - upvote + databse https://stackoverflow.com/questions/30473647/how-can-i-detect-if-a-user-tries-to-upvote-once-again 
-    - rank news
+    - rank news (<24 hrs, tfidf/length?)
     - test cases
 Other
     How to choose best news to show? cosine similarity? + others?
+        
 Build test cases for main func.
     check updates are implemented
 General refactor
@@ -21,6 +19,7 @@ General refactor
     change categories to only 1 asdf/asdf/asdf instead of individual ones (not all newspapers have many)
 Future devs
     add detailed website with summary + forum
+    upvotes and ranking
 
 
 """
@@ -62,7 +61,7 @@ def data_scraper(how_many=500):
 
     for newspaper in settings.OUTLETS:
 
-        print(newspaper)
+        print('\n',newspaper)
  
         # get all news links for each newspaper
         news_link = ns.get_links(newspaper.strip(),how_many)
