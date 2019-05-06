@@ -26,10 +26,10 @@ def get_links(url,n_links=5):
     # give parameters to scrape website depending on link
     if parsed_url.netloc == 'www.canarias7.es':
         # try to find all <a> with title tag
-        for link in html.find_all(['h2','h3','div'], attrs={'class':'headline'}, limit=n_links): #include div (more news but more noise)
-            if not link.parent.has_attr('href'):# skip None links - without the structure (normally voting polls etc)
-                continue
-            links.append(link.parent['href'])
+        for link in html.find_all(['h2','h3','div'], attrs={'class':'headline'}): #include div (more news but more noise)
+            if link.parent.has_attr('href'):# skip None links - without the structure (normally voting polls etc)
+                links.append(link.parent['href'])
+            
 
     if parsed_url.netloc == 'www.laprovincia.es':
         for link in html.find_all('a', attrs={'data-tipo':'noticia'}):
@@ -142,7 +142,7 @@ def extract_data(url):
                 if html.find(attrs={'class':'itemIntroText'}) else ""
             date = html.find(attrs={'class':'gkDate'}).get_text().strip()\
                 if html.find(attrs={'class':'gkDate'}) else ""
-            author = html.find(attrs={'class':'itemAuthor'}).get_text().strip().title()\
+            author = html.find(attrs={'class':'itemAuthor'}).get_text().strip().title().split()[-1]\
                 if html.find(attrs={'class':'itemAuthor'}) else 'Anónimo'
             n_comments = ""
             categories = parsed_url.path.split('/')[1:3]
