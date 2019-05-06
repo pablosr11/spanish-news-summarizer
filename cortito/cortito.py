@@ -4,24 +4,23 @@
 
 """
 Flask basic website
-    - add provincia/noticanarias/https://www.todalaprensa.com/Espana/canarias.htm
-    - upvote + databse https://stackoverflow.com/questions/30473647/how-can-i-detect-if-a-user-tries-to-upvote-once-again 
+    - noticanarias/https://www.todalaprensa.com/Espana/canarias.htm
     - points not matching with article
-
+    - upvote + databse https://stackoverflow.com/questions/30473647/how-can-i-detect-if-a-user-tries-to-upvote-once-again 
+    - rank news
+    - test cases
 Other
     How to choose best news to show? cosine similarity? + others?
-    Access to summary / news source?
-    Comments etc etc etc
 Build test cases for main func.
     check updates are implemented
 General refactor
-    add provincia/noticanarias/https://www.todalaprensa.com/Espana/canarias.htm
     improve cleaning func (» symbols and HTML from text)
-    if no author, anonimo
     multithread on web scraping
     separate calculate tf in two functs
-    reduce complexity
-
+    change scraping in canarias7
+    change categories to only 1 asdf/asdf/asdf instead of individual ones (not all newspapers have many)
+Future devs
+    add detailed website with summary + forum
 
 
 """
@@ -62,6 +61,8 @@ def data_scraper(how_many=500):
     links_scraped, links_skipped = 0, 0
 
     for newspaper in settings.OUTLETS:
+
+        print(newspaper)
  
         # get all news links for each newspaper
         news_link = ns.get_links(newspaper.strip(),how_many)
