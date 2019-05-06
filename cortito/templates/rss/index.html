@@ -4,7 +4,7 @@
         <meta name="referrer" content="origin">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-        <link rel="shortcut icon" href="favicon.ico">
+        <link rel="shortcut icon" href="/static/img/foro.png">
         <title>Foro Canario</title>
     </head>
     <body>
@@ -46,7 +46,7 @@
                     </td>
                     <td valign="top" class="votelinks">
                         <center>
-                            <a id='up_{{article.id}}' onclick='return vote(event, this, "up")' href='vote?id=19827336&amp;how=up&amp;auth=d42ca3917c6097a08a83bdee1c1e785d0c3f1c92&amp;goto=news'>
+                            <a id='up_{{article.id}}'>
                                 <div class='upvote' title='upvote'></div>
                             </a>
                         </center>
@@ -83,17 +83,12 @@
                 <!-- HASTA AQUI --><!-- HASTA AQUI --><!-- HASTA AQUI -->
                 <!-- HASTA AQUI --><!-- HASTA AQUI --><!-- HASTA AQUI -->
                 <tr class="morespace" style="height:10px"></tr>
-                <tr>
-                    <td colspan="2"></td>
-                    <td class="titulo">
-                        <a href="#" class="morelink" rel="next">More</a>
-                    </td>
-                </tr>
+                
             </table>
 
             <tr>
                 <td>
-                    <img src="s.gif" height="10" width="0">
+                    
                     <table width="100%" cellspacing="0" cellpadding="1">
                         <tr>
                             <td bgcolor="#ff6600"></td>
