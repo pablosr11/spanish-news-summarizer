@@ -46,6 +46,32 @@ def get_links(url,n_links=5):
         for link in html.find_all('h4', attrs={'class':'nspHeader'}):
             links.append(link.findChildren('a')[0]['href'])
     
+    #add data scrapers#add data scrapers#add data scrapers#add data scrapers#add data scrapers
+    if parsed_url.netloc == 'canariasnoticias.es':
+        for link in html.find_all(attrs={'class':'title'}):
+            links.append(link.find('a')['href'])
+
+    if parsed_url.netloc == 'www.sanborondon.info':
+        for link in html.find_all(attrs={'class':'nspHeader'}):
+            links.append(link.find('a')['href'])
+
+    if parsed_url.netloc == 'tribunadecanarias.es':
+        for link in html.find_all(attrs={'class':'ns2-title'}):
+            links.append(link.find('a')['href'])
+
+    if parsed_url.netloc == 'www.canariasdiario.com':
+        for link in html.find_all(attrs={'itemprop':'mainEntityOfPage'}):
+            links.append(link['href'])
+
+    if parsed_url.netloc == 'www.europapress.es':
+        for link in html.find_all(attrs={'itemprop':'headline'}):
+            print(link)
+            links.append(link.find('a')['href'])
+
+    if parsed_url.netloc == 'www.efe.com':
+        for link in html.find_all('a', attrs={'itemprop':'url'}):
+            links.append(link['href'])
+
     
     return links
 
@@ -176,7 +202,8 @@ def extract_data(url):
 
 
 if __name__ == "__main__":
-    pass
-    #print(get_links('http://www.eldigitaldecanarias.net/'))
+    
+    print(get_links('https://www.efe.com/efe/canarias/14'))
     #for x in get_links('http://www.eldigitaldecanarias.net'):
     #    print(extract_data(x))
+    pass

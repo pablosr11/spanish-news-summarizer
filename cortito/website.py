@@ -14,7 +14,7 @@ def website():
     session = Session()
 
     # how many news do we show?
-    n_articles = settings.ARTICLES_TO_SHOW 
+    n_articles = settings.ARTICLES_TO_SHOW
 
     # time difference now vs hours on board
     last_x_hours = (datetime.now()-timedelta(hours=settings.TIME_ON_BOARD))
