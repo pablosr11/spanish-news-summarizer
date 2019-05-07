@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 from sqlalchemy import desc
+import settings
 from .database import Session, Article, Article_NLP
 from datetime import datetime, timedelta
 
@@ -13,13 +14,10 @@ def website():
     session = Session()
 
     # how many news do we show?
-    n_articles = 30
-
-    # how much time do news stay in board?
-    hours_on_board = 18
+    n_articles = settings.ARTICLES_TO_SHOW 
 
     # time difference now vs hours on board
-    last_x_hours = (datetime.now()-timedelta(hours=hours_on_board))
+    last_x_hours = (datetime.now()-timedelta(hours=settings.TIME_ON_BOARD))
     
     #give X number articles of the last X hours ordered by score
     articles = session.query(Article, Article_NLP, )\
