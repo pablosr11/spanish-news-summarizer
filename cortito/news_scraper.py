@@ -25,7 +25,6 @@ def get_links(url,n_links=5):
 
     # give parameters to scrape website depending on link
     if parsed_url.netloc == 'www.canarias7.es':
-        # try to find all <a> with title tag
         for link in html.find_all(['h2','h3','div'], attrs={'class':'headline'}): #include div (more news but more noise)
             if link.parent.has_attr('href'):# skip None links - without the structure (normally voting polls etc)
                 links.append(link.parent['href'])
@@ -92,7 +91,8 @@ def extract_data(url):
             n_comments = html.find(attrs={'class':'textveces'}).get_text().strip()\
                 if html.find(attrs={'class':'textveces'}) else 0
             categories = parsed_url.path.split('/')[1:3]
-            labels = [] #[topic.get_text() for topic in html.find(attrs={'id':'listaTags'}).findChildren('a')]
+            labels = [x.get_text() for x in html.find(attrs={'id':'listaTags'}).findChildren('a')[1:]]\
+                if html.find(attrs={'id':'listaTags'}) else []
         except Exception as e:
             print(e, parsed_url.path[1:])
 
@@ -111,7 +111,8 @@ def extract_data(url):
             n_comments = html.find(attrs={'class':'textveces'}).get_text().strip()\
                 if html.find(attrs={'class':'textveces'}) else 0
             categories = parsed_url.path.split('/')[1:3]
-            labels = [] #[topic.get_text() for topic in html.find(attrs={'id':'listaTags'}).findChildren('a')]
+            labels = [x.get_text() for x in html.find(attrs={'id':'listaTags'}).findChildren('a')[1:]]\
+                if html.find(attrs={'id':'listaTags'}) else []
         except Exception as e:
             print(e, parsed_url.path[1:])
 
@@ -128,7 +129,8 @@ def extract_data(url):
                 if html.find(attrs={'itemprop':'name'}) else 'Anónimo'
             n_comments = ""
             categories = ['','']
-            labels = [] #[topic.get_text() for topic in html.find(attrs={'id':'listaTags'}).findChildren('a')]
+            labels = [x.get_text() for x in html.find_all('a',attrs={'rel':'tag'})]\
+                if html.find_all('a',attrs={'rel':'tag'}) else []
         except Exception as e:
             print(e, parsed_url.path[1:])
 
