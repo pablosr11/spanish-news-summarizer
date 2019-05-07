@@ -3,24 +3,29 @@
 """
 
 """
-Flask basic website
-    - rank news (<24 hrs, tfidf/length?)
-    - test cases
-Other
-    How to choose best news to show? cosine similarity? + others?
-        
+add http://tribunadecanarias.es/, https://canariasnoticias.es/, http://canariasenhora.com/#!/
+    http://www.sanborondon.info/, https://www.canariasdiario.com/, http://www.librediariodigital.net/,
+    https://atlanticohoy.com/, https://www.europapress.es/islas-canarias/, 
+    https://www.efe.com/efe/canarias/14
+multithread (create list of object, then save in mass to db)
+    https://stackoverflow.com/questions/2846653/how-to-use-threading-in-python
+    https://medium.com/python-pandemonium/how-to-speed-up-your-python-web-scraper-by-using-multiprocessing-f2f4ef838686
+deploy web/script
+cleanup github, write desc etc
+
+ 
 Build test cases for main func.
     check updates are implemented
 General refactor
+    scrape comments properly (now mostly "")
     improve cleaning func (» symbols and HTML from text)
-    multithread on web scraping
     separate calculate tf in two functs
-    change scraping in canarias7
-    change categories to only 1 asdf/asdf/asdf instead of individual ones (not all newspapers have many)
 Future devs
     add detailed website with summary + forum
     upvotes and ranking
 
+
+python -m cProfile [-o 'profiler'] [-s 'tottime'] myscript.py
 
 """
 
@@ -39,6 +44,8 @@ import settings #import list of newspapers
 from database import Article, Article_NLP, Word_Repo
 from database import Session
 from sqlalchemy.orm import sessionmaker
+
+from multiprocessing import Pool
 
 
 #initiate session to talk to the database
@@ -61,7 +68,7 @@ def data_scraper(how_many=500):
 
     for newspaper in settings.OUTLETS:
 
-        print('\n',newspaper)
+        print(newspaper)
  
         # get all news links for each newspaper
         news_link = ns.get_links(newspaper.strip(),how_many)
@@ -240,8 +247,9 @@ def nlp_magic():
     
     for article in articles:
 
-        # check if words updated are included in the articles, if not, skip the article
-        if len(word_update_idf & set(article.term_freq)) < 5:
+        # check if words updated are included in the articles,
+        #  if not, skip the article (dont update its summary etc)
+        if len(word_update_idf & set(article.term_freq)) < 20:
             continue
         
         #article's words tf-idf scores.
@@ -270,7 +278,7 @@ def nlp_magic():
         top_words = nlp.top_words(article.raw_text,doc_tfidf)
 
         #keep summary to the smallest (function will round up to avoid empty strings)
-        summary = nlp.summarizer(article.raw_text,doc_tfidf,0.90)
+        summary = nlp.summarizer(article.raw_text,doc_tfidf,0.95)
 
         #get the article from database
         art_nlp = session.query(Article_NLP).filter(Article_NLP.article_id == article.id).first()
