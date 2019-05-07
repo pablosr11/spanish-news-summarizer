@@ -13,7 +13,6 @@ multithread (create list of object, then save in mass to db)
 deploy web/script
 cleanup github, write desc etc
 
- 
 Build test cases for main func.
     check updates are implemented
 General refactor
@@ -24,9 +23,6 @@ Future devs
     add detailed website with summary + forum
     upvotes and ranking
 
-
-python -m cProfile [-o 'profiler'] [-s 'tottime'] myscript.py
-
 """
 
 import sys#look for files outsite directory as well
@@ -35,7 +31,7 @@ sys.path.append('../')
 import math
 import news_scraper as ns #import scraping functionality
 import nlp_scorer as nlp #nlp functionality
-import datetime #get scraping time
+
 import pickle
 import time
 import traceback
@@ -44,8 +40,9 @@ import settings #import list of newspapers
 from database import Article, Article_NLP, Word_Repo
 from database import Session
 from sqlalchemy.orm import sessionmaker
+from datetime import datetime, timedelta
 
-from multiprocessing import Pool
+from multiprocessing.dummy import Pool as ThreadPool 
 
 
 #initiate session to talk to the database
@@ -107,7 +104,7 @@ def data_scraper(how_many=500):
                 raw_text = data['raw_text'],
                 term_freq = tf,
                 nlp_analysed = False,
-                last_scrape_date = datetime.datetime.now()
+                last_scrape_date = datetime.now()
             )
 
             session.add(article)
@@ -130,7 +127,10 @@ def build_word_repo():
     articles_analysed = 0
     total_word_occurrences = 0
 
-    docs_repo = session.query(Article)
+    #only work on articles that are in time to make it on board
+    last_x_hours = (datetime.now()-timedelta(hours= settings.TIME_ON_BOARD))
+
+    docs_repo = session.query(Article).filter(Article.last_scrape_date>last_x_hours)
 
     #right now iterates over everything, look for a way to filter it out (old files no need to redo?)
     for article in docs_repo:
@@ -169,18 +169,6 @@ def build_word_repo():
             # add total occurrences every time, but only once per doc for articles with word
             # if word is already in database, modify its counters
             if raw:
-
-                #fail check
-                if raw.articles_with_word > docs_repo.count():
-                    print(f'{raw.word_raw} appears in more docs than total docs')
-                    continue
-                    """
-                    sys.exit(f'TFIDF Error - More articles with word than articles.\
-                     \nWord: {raw.word_stemm}, {raw.word_raw}\
-                     \nTotal docs:  {docs_repo.count()}\
-                     \nDocs with Word: {raw.articles_with_word}')
-                     """
-
 
                 #if we haven't store this document word, update counter and add it to tracker
                 if w_stemm not in words_included:
@@ -231,7 +219,7 @@ def idf_updater():
 
     #reset set of words updated
 
-def nlp_magic():
+def rank_docs():
     """
     for every article, calculate tfidf, rank its sentences, get top words and store a small summary
     """
@@ -241,10 +229,14 @@ def nlp_magic():
     #tracker for final print statement
     articles_updated = 0
 
-    articles = session.query(Article)
+    # only update articles of the last cicle
+    last_x_hours = (datetime.now()-timedelta(hours= settings.TIME_ON_BOARD))
+   
+    articles = session.query(Article).filter(Article.last_scrape_date>last_x_hours)
     words = session.query(Word_Repo)
 
-    
+    articles_to_add = []
+
     for article in articles:
 
         # check if words updated are included in the articles,
@@ -252,24 +244,11 @@ def nlp_magic():
         if len(word_update_idf & set(article.term_freq)) < 20:
             continue
         
-        #article's words tf-idf scores.
-        doc_tfidf = {}
-
         #tracker
         articles_updated += 1
 
-        for word, term_freq in article.term_freq.items():
-
-            #get idf of the current word we are iterating
-            w_idf = words.filter(Word_Repo.word_stemm == word).first().idf
-        
-            #fail check as both idf and tf have to be positive
-            if w_idf < 0 or term_freq < 0:
-                print('(INVALID) Negative IDF or TF', article.link)
-
-            #store new tfidf score in local dict
-            doc_tfidf[word] = nlp.calculate_tfidf(term_freq,w_idf)
-
+        #build tf-idf dict
+        doc_tfidf = nlp.build_tfidf_dict(article,words,Word_Repo)
        
         #rank sentences
         ranked_sentences = nlp.rank_sentences(article.raw_text,doc_tfidf)
@@ -280,50 +259,71 @@ def nlp_magic():
         #keep summary to the smallest (function will round up to avoid empty strings)
         summary = nlp.summarizer(article.raw_text,doc_tfidf,0.95)
 
-        #get the article from database
-        art_nlp = session.query(Article_NLP).filter(Article_NLP.article_id == article.id).first()
-
         #sum the score out of its sentences
         art_score = sum([x[1] for x in ranked_sentences])
 
+        #add record to list of articles
+        articles_to_add.append([article,ranked_sentences, top_words, summary, art_score])
+
+        
+
+    #separate adding to db from building articles
+    for art in articles_to_add:
+
+        art_id = art[0].id
+        ranked_sentences = art[1]
+        top_words = art[2]
+        short_summary = art[3]
+        score = art[4]
+
+        #query existing articles_nlp with this article.id
+        art_in_db = session.query(Article_NLP).filter(Article_NLP.article_id == art_id).first()
+
         #if item already in database, update numbers and continue, no need to create
-        if art_nlp:
-            art_nlp.ranked_sentences = ranked_sentences
-            art_nlp.top_words = top_words
-            art_nlp.short_summary = summary
-            art_nlp.score = art_score
-            session.commit()
+        if art_in_db:
+            art_in_db.ranked_sentences = ranked_sentences
+            art_in_db.top_words = top_words
+            art_in_db.short_summary = short_summary
+            art_in_db.score = score
+            #session.commit() #should I commit once outside loop?
             continue
 
 
-        #persist data in database
+        #if not in db, create new one
         article_nlp = Article_NLP(
-            article_id = article.id,
+            article_id = art_id,
             ranked_sentences = ranked_sentences,
             top_words = top_words,
-            short_summary = summary,
-            score = art_score
+            short_summary = short_summary,
+            score = score
         )
 
         #change flag and add to database
-        article.nlp_analysed = True
+        art[0].nlp_analysed = True
         session.add(article_nlp)
-        session.commit()
+
+    session.commit()
+        
     
+
     #empty tracker of new words added
     word_update_idf.clear()
 
     print(f'[NLP] Articles updated: {articles_updated}')
+    print('to add how many', len(articles_to_add))
+    
+
 
 
 if __name__ == "__main__":
     while True:
         print(f"{time.ctime()}: Starting cycle")
         try:
+            #pool = ThreadPool(8)
             data_scraper()
             build_word_repo()
             idf_updater()
-            nlp_magic()
+            rank_docs()
         except KeyboardInterrupt:
             print("Exiting....")
             sys.exit(1)
