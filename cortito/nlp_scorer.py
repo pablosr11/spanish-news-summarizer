@@ -63,6 +63,26 @@ def calculate_tfidf(word_tf, word_idf):
     
     return word_tf*word_idf
 
+def build_tfidf_dict(article,words,Word_Repo):
+    """ returns a dict {word-n:tfidf-score} given an article, its words
+    and the word repo"""
+
+    tfidf_dict = {}
+
+    for word, term_freq in article.term_freq.items():
+
+            #get idf of the current word we are iterating
+            w_idf = words.filter(Word_Repo.word_stemm == word).first().idf
+        
+            #fail check as both idf and tf have to be positive
+            if w_idf < 0 or term_freq < 0:
+                print('(INVALID) Negative IDF or TF', article.link)
+
+            #store new tfidf score in local dict
+            tfidf_dict[word] = calculate_tfidf(term_freq,w_idf)
+    
+    return tfidf_dict
+
 def rank_sentences(doc,tfidf_dict,include_words=False):
     """given document and the document tfidf_dict {word:word_tfidfscore}, return list of
     ranked senteces and its score [(sent,score),(sen2,score2)]"""
