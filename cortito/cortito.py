@@ -11,7 +11,7 @@ Build test cases for main func.
     check updates are implemented
 General refactor
     scrape comments properly (now mostly "")
-    improve cleaning func (» symbols and HTML from text)
+    improve cleaning func ( symbols and HTML from text)
     separate calculate tf in two functs
 Future devs
     add forum (with summary?)
