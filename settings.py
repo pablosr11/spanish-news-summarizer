@@ -7,7 +7,8 @@
 
 #newspapers to analyse
 OUTLETS = ['https://www.canarias7.es/', 'https://www.laprovincia.es/','https://www.eldia.es/',\
-    'https://www.noticanarias.com/','http://www.canarias24horas.com/']
+    'https://www.noticanarias.com/','http://www.canarias24horas.com/','http://tribunadecanarias.es/',\
+    'https://canariasnoticias.es/']
 
 #waiting time between processes
 WAITING_TIME = 60*60 #60min

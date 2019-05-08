@@ -10,6 +10,7 @@ todo:   fail-checks on .finds
 """
 
 from urllib.parse import urlparse #parse the url
+import datetime
 import helpers #get all the helper functions
 
 def get_links(url,n_links=5):
@@ -98,7 +99,8 @@ def extract_data(url):
             n_comments = html.find(attrs={'class':'numComments'}).get_text().strip()\
                 if html.find(attrs={'class':'numComments'}) else 0
             categories = parsed_url.path.split('/')[1:3]
-            labels = [topic.find('a').get_text() for topic in html.find_all(attrs={'class':'topic'})]
+            labels = [topic.find('a').get_text() if topic.find('a') else ""\
+                for topic in html.find_all(attrs={'class':'topic'})]
         except Exception as e:
             print(e, parsed_url.path[1:])
 
@@ -179,6 +181,44 @@ def extract_data(url):
         except Exception as e:
             print(e, parsed_url.path[1:])
 
+    if parsed_url.netloc == 'canariasnoticias.es':
+        try:
+            text = ' '.join([x.get_text().strip() for x in html.find(attrs={'class':'noticia-body'}).findChildren('p')])\
+                if html.find(attrs={'class':'noticia-body'}) else ""
+            headline = html.find('h1', attrs={'class':'title'}).get_text().strip()\
+                if html.find('h1', attrs={'class':'title'}) else ""
+            subheadline = html.find('h3', attrs={'class':'subtitle'}).get_text().strip()\
+                if html.find('h3', attrs={'class':'subtitle'}) else ""
+            date = html.find(attrs={'class':'date'}).get_text().strip()\
+                if html.find(attrs={'class':'date'}) else ""
+            author = html.find(attrs={'class':'author'}).get_text().strip().title()\
+                if html.find(attrs={'class':'author'}) else 'Anónimo'
+            n_comments = html.find(attrs={'class':'comment-count'}).get_text().strip()\
+                if html.find(attrs={'class':'comment-count'}) else 0
+            categories = parsed_url.path.split('/')[1:3]
+            labels = []
+        except Exception as e:
+            print(e, parsed_url.path[1:])
+
+    if parsed_url.netloc == 'tribunadecanarias.es':
+        try:
+            text = ' '.join([x.get_text().strip() for x in html.find(attrs={'itemprop':'articleBody'}).findChildren('p')])\
+                if html.find(attrs={'itemprop':'articleBody'}) else ""
+            headline = html.find(attrs={'itemprop':'headline'}).get_text().strip()\
+                if html.find(attrs={'itemprop':'headline'}) else ""
+            subheadline = html.find(attrs={'class':'subheadline'}).get_text().strip()\
+                if html.find(attrs={'class':'subheadline'}) else ""
+            date = html.find(attrs={'id':'t1'}).get_text().strip()\
+                if html.find(attrs={'id':'t1'}) else datetime.datetime.now().strftime('%Y-%m-%d')
+            author = html.find(attrs={'itemprop':'author'}).get_text().strip().title()\
+                if html.find(attrs={'itemprop':'author'}) else 'Anónimo'
+            n_comments = html.find(attrs={'class':'numComments'}).get_text().strip()\
+                if html.find(attrs={'class':'numComments'}) else 0
+            categories = parsed_url.path.split('/')[1:3]
+            labels = []
+        except Exception as e:
+            print(e, parsed_url.path[1:])
+
     
     
    #save categories in one
@@ -203,7 +243,8 @@ def extract_data(url):
 
 if __name__ == "__main__":
     
-    print(get_links('https://www.efe.com/efe/canarias/14'))
-    #for x in get_links('http://www.eldigitaldecanarias.net'):
-    #    print(extract_data(x))
+    #print(get_links('https://www.efe.com/efe/canarias/14'))
+    for x in get_links('http://tribunadecanarias.es/'):
+        print('asdfasdfasdfa')
+        print(extract_data('http://tribunadecanarias.es/'+x))
     pass
