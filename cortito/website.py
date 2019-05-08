@@ -28,6 +28,11 @@ def website():
 
     return render_template('rss/index.html', articles=articles)
 
+@app.route('/preguntas')
+def preguntas():
+        return render_template('rss/preguntas.html')
+
+
 @app.teardown_appcontext
 def cleanup(resp_or_exc):
     Session.remove()

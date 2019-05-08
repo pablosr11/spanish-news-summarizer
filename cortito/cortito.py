@@ -3,13 +3,7 @@
 """
 
 """
-add http://tribunadecanarias.es/, https://canariasnoticias.es/, http://canariasenhora.com/#!/
-    http://www.sanborondon.info/, https://www.canariasdiario.com/, http://www.librediariodigital.net/,
-    https://atlanticohoy.com/, https://www.europapress.es/islas-canarias/, 
-    https://www.efe.com/efe/canarias/14
-multithread (create list of object, then save in mass to db)
-    https://stackoverflow.com/questions/2846653/how-to-use-threading-in-python
-    https://medium.com/python-pandemonium/how-to-speed-up-your-python-web-scraper-by-using-multiprocessing-f2f4ef838686
+
 deploy web/script
 cleanup github, write desc etc
 
@@ -20,8 +14,11 @@ General refactor
     improve cleaning func (» symbols and HTML from text)
     separate calculate tf in two functs
 Future devs
-    add detailed website with summary + forum
-    upvotes and ranking
+    add forum (with summary?)
+    add upvotes
+    ranking : count in upvotes, visits.
+    multithread
+
 
 """
 
@@ -303,14 +300,11 @@ def rank_docs():
         session.add(article_nlp)
 
     session.commit()
-        
     
-
     #empty tracker of new words added
     word_update_idf.clear()
 
     print(f'[NLP] Articles updated: {articles_updated}')
-    print('to add how many', len(articles_to_add))
     
 
 
