@@ -18,3 +18,15 @@ TIME_ON_BOARD = 18
 
 #how many articles do we show
 ARTICLES_TO_SHOW = 30
+
+# minimum words per article
+MINIMUM_WORDS_ARTICLE = 100
+
+# how many updated words to update tfidf of file?
+UPDATED_WORDS = 20
+
+# how much (%) to summarize article?
+SUMMARIZATION_POINTS = 0.95
+
+#how many top words include?
+TOP_WORDS_NUMBER = 10

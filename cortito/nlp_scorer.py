@@ -12,6 +12,7 @@ todo:   summary sometimes return empty string
 import helpers #get all the helper functions
 import collections #for fast frequency counters
 import math #calculate tfidf-log
+import settings
 
 
 def calculate_tf(doc):
@@ -101,7 +102,7 @@ def rank_sentences(doc,tfidf_dict,include_words=False):
     
     return ranked_sentences
 
-def top_words(doc,tfidf_dict,n_words=10):
+def top_words(doc,tfidf_dict,n_words=settings.TOP_WORDS_NUMBER):
     """Given list of words, and its tfidf dict {word:tfidf_score} return list of top X words"""
 
     word_list = helpers.clean(doc)
@@ -109,7 +110,7 @@ def top_words(doc,tfidf_dict,n_words=10):
     top_words = sorted(words_score,key=lambda kv: kv[1],reverse=True)[0:n_words]
 
     # return raw words in order
-    result = [word[1] for top in top_words for word in word_list if top[0] in word]
+    result = [word[1] for top in top_words for word in set(word_list) if top[0] in word]
 
     return result
 
@@ -134,8 +135,4 @@ def summarizer(doc,tfidf_dict,reduce_by=0.5):
 
 if __name__ == "__main__":
 
-    print(top_words('Hola me llamo Pablito y me gusta el baloncesto. De pequeño jugaba a diario. La playa',\
-        {'hol': 0.012476262887086049, 'llam': 0.04063626083895473, 'pablit': 0.03717667089609877, 'gust': 0.015980023536257035,\
-        'baloncest': 0.04063626083895473, 'pequeñ': 0.012476262887086049, 'diari': 0.018588335448049383, 'jug': 0.020318130419477366,\
-        'play': 0.03717667089609877}))
     print('-----nlp_scorer.py')

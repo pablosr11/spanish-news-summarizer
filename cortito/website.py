@@ -36,3 +36,6 @@ def preguntas():
 @app.teardown_appcontext
 def cleanup(resp_or_exc):
     Session.remove()
+
+if __name__ == "__main__":
+    app.run(debug=True)

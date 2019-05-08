@@ -39,8 +39,6 @@ from database import Session
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timedelta
 
-from multiprocessing.dummy import Pool as ThreadPool 
-
 
 #initiate session to talk to the database
 session = Session()
@@ -80,7 +78,7 @@ def data_scraper(how_many=500):
             data = ns.extract_data(full_link)
 
             #skip articles with less than 100 words
-            if len(data['raw_text'].split()) < 100:
+            if len(data['raw_text'].split()) < settings.MINIMUM_WORDS_ARTICLE:
                 links_skipped += 1
                 continue
 
@@ -238,7 +236,7 @@ def rank_docs():
 
         # check if words updated are included in the articles,
         #  if not, skip the article (dont update its summary etc)
-        if len(word_update_idf & set(article.term_freq)) < 20:
+        if len(word_update_idf & set(article.term_freq)) < settings.UPDATED_WORDS:
             continue
         
         #tracker
@@ -254,7 +252,7 @@ def rank_docs():
         top_words = nlp.top_words(article.raw_text,doc_tfidf)
 
         #keep summary to the smallest (function will round up to avoid empty strings)
-        summary = nlp.summarizer(article.raw_text,doc_tfidf,0.95)
+        summary = nlp.summarizer(article.raw_text,doc_tfidf,settings.SUMMARIZATION_POINTS)
 
         #sum the score out of its sentences
         art_score = sum([x[1] for x in ranked_sentences])
@@ -313,7 +311,6 @@ if __name__ == "__main__":
     while True:
         print(f"{time.ctime()}: Starting cycle")
         try:
-            #pool = ThreadPool(8)
             data_scraper()
             build_word_repo()
             idf_updater()
