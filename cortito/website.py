@@ -9,7 +9,7 @@ from database import Session, Article, Article_NLP
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-app.config['ENV'] = 'production'
+app.config['ENV'] = 'development'
 
 @app.route('/')
 def website():
@@ -42,4 +42,4 @@ def cleanup(resp_or_exc):
     Session.remove()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=80)

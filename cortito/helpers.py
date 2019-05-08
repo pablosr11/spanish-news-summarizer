@@ -9,9 +9,13 @@ todo: ngrams
 """
 import requests #download websites
 from bs4 import BeautifulSoup #scrape websites
+import lxml
 import string #remove punctuation with string.translate
+
 from nltk.stem.snowball import SnowballStemmer #ciudades -> ciudad
+
 from nltk.corpus import stopwords #for spanish stopwords
+
 
 
 def get_html(url):

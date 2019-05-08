@@ -25,6 +25,7 @@ Future devs
 import sys#look for files outsite directory as well
 sys.path.append('../')
 
+import settings #import list of newspapers
 import math
 import news_scraper as ns #import scraping functionality
 import nlp_scorer as nlp #nlp functionality
@@ -33,7 +34,7 @@ import pickle
 import time
 import traceback
 from sqlalchemy import between
-import settings #import list of newspapers
+
 from database import Article, Article_NLP, Word_Repo
 from database import Session
 from sqlalchemy.orm import sessionmaker

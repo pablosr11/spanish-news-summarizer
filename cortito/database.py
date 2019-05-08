@@ -27,7 +27,7 @@ class Article(Base):
         id = Column(Integer, primary_key=True)
         newspaper = Column(String)
         link = Column(String, unique = True)
-        headline = Column(String, unique = True)
+        headline = Column(String)
         subheadline = Column(String)
         author = Column(String)
         article_date = Column(String)
