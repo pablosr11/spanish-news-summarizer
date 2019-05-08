@@ -1,6 +1,6 @@
 sqlalchemy>=1.2.15
 requests>=2.21.0
-bs4>=4.6.3
+beautifulsoup4>=4.6.3
 nltk>=3.4
 flask>=1.0.2
 

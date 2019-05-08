@@ -1,11 +1,15 @@
 from flask import Flask
 from flask import render_template
 from sqlalchemy import desc
+
+import sys#look for files outsite directory as well
+sys.path.append('../')
 import settings
-from .database import Session, Article, Article_NLP
+from database import Session, Article, Article_NLP
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
+app.config['ENV'] = 'production'
 
 @app.route('/')
 def website():
