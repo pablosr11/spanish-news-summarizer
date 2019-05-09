@@ -7,8 +7,11 @@
 
 #newspapers to analyse
 OUTLETS = ['https://www.canarias7.es/', 'https://www.laprovincia.es/','https://www.eldia.es/',\
-    'https://www.noticanarias.com/','http://www.canarias24horas.com/','http://tribunadecanarias.es/',\
+    'http://www.canarias24horas.com/','http://tribunadecanarias.es/',\
     'https://canariasnoticias.es/']
+    #'https://www.noticanarias.com/' 
+    # requests.exceptions.ConnectionError: ('Connection aborted.', 
+    # RemoteDisconnected('Remote end closed connection without response'))
 
 #waiting time between processes
 WAITING_TIME = 60*60 #60min

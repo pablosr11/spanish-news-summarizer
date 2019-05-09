@@ -4,9 +4,6 @@
 
     
 """
-
-
-
 #https://docs.sqlalchemy.org/en/13/orm/tutorial.html
 import sqlalchemy
 from sqlalchemy import create_engine

@@ -12,6 +12,7 @@ app = Flask(__name__)
 app.config['ENV'] = 'development'
 
 @app.route('/')
+@app.route('/index')
 def website():
 
     #create session to "talk" with database
