@@ -2,7 +2,6 @@
 
     Copyright 2019 Pablo Sanderson Ramos
 
-    
 """
 #https://docs.sqlalchemy.org/en/13/orm/tutorial.html
 import sqlalchemy
