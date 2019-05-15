@@ -106,7 +106,7 @@ venv.bak/
 
 #pablo's
 .db
-/cortito/cortito.db
+app.db
 .DS_Store
-/cortito/main.db
-cortito/main.db
+/migrations
+.flaskenv
