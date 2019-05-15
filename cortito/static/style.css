@@ -16,22 +16,30 @@ a:visited { color:#828282; text-decoration:none; }
 .links { font-family:Verdana, Geneva, sans-serif; font-size:  8pt; color:#828282; }
 .pagetop { font-family:Verdana, Geneva, sans-serif; font-size: 10pt; color:#222222; }
 .comhead { font-family:Verdana, Geneva, sans-serif; font-size:  8pt; color:#828282; }
+.hnname  { margin-right: 5px; }
+.comment { font-family:Verdana, Geneva, sans-serif; font-size:  9pt; }
 .logo  { margin-right: 5px; }
 
 .comhead a:link, .sub a:visited { color:#828282; }
 .comhead a:hover { text-decoration:underline; }
+
+.c00, .c00 a:link { color:#000000; }
+
+
 
 .upvote {
   width:      10px;
   height:     10px;
   border:     0px;
   margin:     3px 2px 6px;
-  background: url('/static/img/arrow.png')
+  background: url('/static/img/arrow.gif')
   no-repeat;
 }
 
+
+
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
-  .upvote { background-size: 10px; background-image: url('/static/img/arrow.png'); }
+  .upvote { background-size: 10px; background-image: url('/static/img/arrow2X.gif'); }
 }
 
 .rotate180 {
