@@ -47,9 +47,9 @@
                                         </center>
                                     </td>
                                     <td class="titulo">
-                                        <a href='{{article.newspaper+article.link}}' target=_blank class="storylink">{{article.headline}}</a>
+                                        <a href='http://{{article.newspaper+article.link}}' target=_blank class="storylink">{{article.headline}}</a>
                                         <span class="sitebit comhead"> 
-                                            - (<a href='{{article.newspaper}}' target=_blank>
+                                            - (<a href='http://{{article.newspaper}}' target=_blank>
                                                 <span class="sitestr">{{article.newspaper}}</span>
                                             </a>)
                                         </span>
@@ -58,11 +58,11 @@
                                 <tr>
                                     <td colspan="2"></td>
                                     <td class="sub">
-                                        <span class="score" id="PUNTUACION">{{article.votes}} puntos |</span>
+                                        <span class="score" id="PUNTUACION">{{article.votes|round|int}} puntos |</span>
                                         <span class="age">
                                                 <span >{{article.article_date}} |</span>
                                         </span>
-                                        por <a href='{{article.newspaper}}' class="hnuser">{{article.author}}</a> 
+                                        por <a href='http://{{article.newspaper}}' class="hnuser">{{article.author}}</a> 
                                         | <a href="{{url_for('item', post_id=1)}}">{{ article.comments|length }}&nbsp;comentarios</a>
                                                     
                                     </td>

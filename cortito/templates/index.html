@@ -15,14 +15,14 @@
                         <table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding:2px">
                             <tr>
                                 <td style="width:18px;padding-right:4px">
-                                    <a href="https://news.ycombinator.com">
+                                    <a href="/">
                                         <img src="/static/img/foro.png" width="18" height="18">
                                     </a>
                                 </td>
                                 <td style="line-height:12pt; height:10px;">
                                     <span class="pagetop">
                                         <b class="logo">
-                                            <a href="#">Foro Canario</a>
+                                            <a href="/">Foro Canario</a>
                                         </b>
                                      </span>
                                 </td>
@@ -34,25 +34,21 @@
                 <tr>
                     <td>
                         <table border="0" cellpadding="0" cellspacing="0" class="itemlist">
-                <!--A PARTIR DE AQUI--><!--A PARTIR DE AQUI--><!--A PARTIR DE AQUI-->
-                <!--A PARTIR DE AQUI--><!--A PARTIR DE AQUI--><!--A PARTIR DE AQUI-->
-                <!--A PARTIR DE AQUI--><!--A PARTIR DE AQUI--><!--A PARTIR DE AQUI-->
-                <!--A PARTIR DE AQUI--><!--A PARTIR DE AQUI--><!--A PARTIR DE AQUI-->
-                <!--A PARTIR DE AQUI--><!--A PARTIR DE AQUI--><!--A PARTIR DE AQUI-->
+
                 {% for article,score in articles %}
                 <tr class='athing' id={{ article.id }}>
                     <td align="right" valign="top" class="titulo">
-                        <span class="rank">{{ loop.index }}</span>
+                        <span class="rank">{{ loop.index }}. </span>
                     </td>
                     <td valign="top" class="votelinks">
                         <center>
-                            <a id='up_{{article.id}}'>
+                            <a id='up_{{article.id}}', href='{{ url_for("vote", art_id=article.id)}}'>
                                 <div class='upvote' title='upvote'></div>
                             </a>
                         </center>
                     </td>
                     <td class="titulo">
-                        <a href=http://{{article.newspaper+article.link}} target=_blank class="storylink">{{ article.headline }}</a>
+                        <a href=http://{{article.newspaper+article.link}} target=_blank class="storylink"> {{ article.headline }}</a>
                         <span class="sitebit comhead"> 
                             - (<a href=http://{{article.newspaper}} target=_blank>
                                 <span class="sitestr">{{ article.newspaper }}</span>
@@ -63,26 +59,28 @@
                 <tr>
                     <td colspan="2"></td>
                     <td class="sub">
-                        <span class="score" id="score_{{ score.score }}">{{ score.score|round|int }} puntos |</span>
+                        <span class="score" id="score_{{ score.score }}">{{ article.votes|round|int }} puntos |</span>
                         <span class="age">
-                                <a href=""> {{article.article_date}} |</a>
+                                <span > {{article.article_date}} |</span>
                         </span>
                         por <a href='http://{{article.newspaper}}' class="hnuser">{{article.author}}</a> 
-                        <!--
-                        <span id="unv_19818916"></span> | 
-                        <a href="">{{article.main_cat}}&nbsp;comentarios</a>
-                        -->             
+                        | <a href="{{url_for('item', post_id=article.id)}}">{{ article.comments|length }}&nbsp;comentarios</a>
+                                    
                     </td>
                 </tr>
                 <tr class="spacer" style="height:5px"></tr>
 
                 {% endfor %}
-                <!-- HASTA AQUI --><!-- HASTA AQUI --><!-- HASTA AQUI -->
-                <!-- HASTA AQUI --><!-- HASTA AQUI --><!-- HASTA AQUI -->
-                <!-- HASTA AQUI --><!-- HASTA AQUI --><!-- HASTA AQUI -->
-                <!-- HASTA AQUI --><!-- HASTA AQUI --><!-- HASTA AQUI -->
-                <!-- HASTA AQUI --><!-- HASTA AQUI --><!-- HASTA AQUI -->
+
                 <tr class="morespace" style="height:10px"></tr>
+                <tr>
+                    <td colspan="2"></td>
+                    <td class="title">
+                        <a href="{{ next_url }}" class="morelink" rel="next">Más</a>
+                        <br><br>
+                    </td>
+                </tr>
+  
                 
             </table>
 
@@ -97,7 +95,7 @@
                     <br>
                     <center>
                         <span class="links">
-                            <a href="/preguntas">FAQ</a>  |
+                            <a href='{{url_for("preguntas")}}'>FAQ</a>  |
                             <a href="mailto:xxxx">Contact</a>
                         </span>
                         <br><br>    
@@ -105,6 +103,7 @@
                 </td>
             </tr>
         </center>
+        <script type="text/javascript" src='{{ url_for('static', filename='fc.js') }}'></script>
     </body>
 </html>
 
