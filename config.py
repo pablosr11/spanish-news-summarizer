@@ -27,8 +27,8 @@ class Config(object):
     'https://canariasnoticias.es/']
 
     #make sure both equal 1
-    VALUE_NLP = 0.7
-    VALUE_VOTES = 0.3
+    VALUE_NLP = 0.9
+    VALUE_VOTES = 0.1
 
     JOB_TIMEOUT = 60*180
     SLEEP_TIME = 60*120

@@ -14,8 +14,8 @@ with open('LICENSE') as f:
     license = f.read()
 
 setup(
-    name='Cortito',
-    version='0.0.1',
+    name='Forocanario',
+    version='0.0.2',
     description='Find summaries of your favourite news outlet',
     long_description=readme,
     author='Pablo Sanderson Ramos',

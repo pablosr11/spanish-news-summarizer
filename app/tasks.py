@@ -87,7 +87,7 @@ def do_work():
                 labels=data['labels'],
                 categories=data['categories'],
                 last_scrape_date=data['scrape_date'],
-                votes=random.random()*10 #test it out
+                votes=random.random()*40 #test it out
             )
             db.session.add(article)
 
