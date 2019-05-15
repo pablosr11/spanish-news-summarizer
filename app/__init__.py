@@ -6,8 +6,6 @@ from flask_migrate import Migrate
 from redis import Redis
 import rq
 
-
-
 app = Flask(__name__)
 app.config.from_object(Config)
 
