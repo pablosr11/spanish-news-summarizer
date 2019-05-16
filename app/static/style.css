@@ -39,7 +39,7 @@ a:visited { color:#828282; text-decoration:none; }
 
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
-  .upvote { background-size: 10px; background: url('img/arrow2X.gif'); }
+  .upvote { background-size: 10px; background-image: url('img/arrow2x.gif'); }
 }
 
 .rotate180 {
