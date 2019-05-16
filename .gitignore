@@ -110,3 +110,4 @@ app.db
 .DS_Store
 /migrations
 .flaskenv
+app.db-journal

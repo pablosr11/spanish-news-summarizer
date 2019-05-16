@@ -17,3 +17,5 @@ app.task_queue = rq.Queue('forocanario-tasks', connection=app.redis)
 
 from app import routes, models
 
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=80)
