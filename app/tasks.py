@@ -4,20 +4,20 @@
 
 """
 
-follow tutorial
-vote arrow not showing
-testing
-concurrent web scraping etc
-in global menu show X hours ago
-only 1 vote 
+-core-
+Build test cases for main func. check updates are implemented
+make the scraper secure/reliable (make sure code 200, proxies etc - notify when break)
+
+-future devs-
+Concurrent web scraping etcm multithread (Pool)
+in index  show X hours ago instead of date (take data from)
+only 1 vote per session/user? 
 ordenar por nuevos, votos, puntuacion, comentarios.
+
+-newspapers-
 laprovincia, el dia pocas noticias
-make te scraper reliable (make sure code 200, proxies etc - notify when break)
-multithread
-cleanup github etc
-Build test cases for main func.
-    check updates are implemented
-add europapress/etc 
+add europapress/etc data scrapers
+
 """
 
 from app import db

@@ -111,3 +111,8 @@ app.db
 /migrations
 .flaskenv
 app.db-journal
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
