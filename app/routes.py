@@ -95,7 +95,7 @@ def page_not_found(e):
     'redirect 404 to last page or /index'
     return redirect(redirect_url())
 
-def redirect_url(default='index'):
+def redirect_url(default='/'):
     return request.args.get('next') or request.referrer or url_for(default)
 
 @app.route('/reply/<comment_id>')
