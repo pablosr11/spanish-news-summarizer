@@ -68,6 +68,10 @@ def do_work():
             if not data:
                 continue
 
+            #skip if headline in db
+            if Article.query.filter(Article.headline == data['headline']).first():
+                continue
+
             #calculate termfreq and store its term frequency
             tf = calculate_tf(data['raw_text'])
             data['term_freq'] = tf
