@@ -15,21 +15,6 @@ from sqlalchemy import desc
 @app.route('/index')
 def index():
 
-    """ 
-        every time the page is loaded, check if the task queue is empty and 
-        execute full process. Will always be 1 in queue and 1 executing as
-        the the queue doesnt update as fast as people can access the website
-        it will wait TIME_SLEEP before closing the job. always make sure job_
-        timeout is greater than time_sleep
-
-        !!! move this away from here 
-    """
-    if not len(app.task_queue):
-        job = app.task_queue.enqueue('app.tasks.do_work', job_timeout=app.config['JOB_TIMEOUT'])
-        print('job queued', job.id)
-
-    
-
     #pagination
     p = request.args.get('p', 1, type=int)
 
@@ -46,6 +31,20 @@ def index():
     #pagination
     next_url = url_for('index', p=articles.next_num) \
         if articles.has_next else None
+
+    """ 
+        every time the page is loaded, check if the task queue is empty and 
+        execute full process. Will always be 1 in queue and 1 executing as
+        the the queue doesnt update as fast as people can access the website
+        it will wait TIME_SLEEP before closing the job. always make sure job_
+        timeout is greater than time_sleep
+
+        !!! move this away from here 
+    """
+    if not len(app.task_queue):
+        job = app.task_queue.enqueue('app.tasks.do_work', job_timeout=app.config['JOB_TIMEOUT'])
+        #print('job queued', job.id)
+
 
     return render_template('index.html', articles=articles.items, next_url=next_url)
 
