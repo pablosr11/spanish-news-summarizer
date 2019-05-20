@@ -41,7 +41,7 @@ def index():
 
         !!! move this away from here 
     """
-    if not len(app.task_queue):
+    if len(app.task_queue) <= app.config['JOBS_IN_QUEUE']:
         job = app.task_queue.enqueue('app.tasks.do_work', job_timeout=app.config['JOB_TIMEOUT'])
         #print('job queued', job.id)
 

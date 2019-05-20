@@ -21,6 +21,7 @@ class Config(object):
 
     #delete
     HOURS_IN_BOARD = 16
+    JOBS_IN_QUEUE = 4
     TFIDF_UPDATE_HOURS = 3
     MINIMUM_WORDS_PER_ARTICLE = 100
     MAXIMUM_WORD_LENGTH = 20
