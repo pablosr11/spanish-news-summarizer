@@ -22,5 +22,5 @@ setup(
     author_email='pablosr11@gmail.com',
     url='https://github.com/pablosr11/spanish-news-summarizer',
     license=license,
-    packages=find_packages(exclude=('tests', 'docs'))
+    packages=find_packages(exclude=('docs'))
 )
