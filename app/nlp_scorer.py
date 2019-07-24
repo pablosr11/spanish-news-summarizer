@@ -13,6 +13,7 @@ import helpers #get all the helper functions
 import collections #for fast frequency counters
 import math #calculate tfidf-log
 import settings
+#import spacy
 
 
 def calculate_tf(doc):
